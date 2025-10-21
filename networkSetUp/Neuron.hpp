@@ -1,35 +1,22 @@
 #pragma once
 
 #include <vector>
-#include <optional>
-
-using std::vector;
-using std::optional;
-
-
-double reluSingle(double x);
-void reluVector(vector<double>& values);
-double reluSingleDerivative(double x);
-void reluVectorDerivative(vector<double>& inputVector, vector<double>& outputVector);
 
 struct Neuron {
-private:
-    vector<double> weights;
-    double bias;
-    double delta;
-    double output;
+    private:
+        std::vector<double> weights;
+        double bias;
+        double delta;
+        double output;
 
-    void setOutput(double output);
+        void setOutput(double output);
 
-public:
-    Neuron();
-
-    double getOutput() const;
-    vector<double> getWeights() const;
-    void UpdateWeights(int index, double weightCalculation, bool backpropogate);
-    void updateBiases(double rate, double delta);
-    double getDelta() const;
-    void setDelta(double error);
-    double calculateWeightedSum(const vector<double>& inputs);
-    double activationFunction(const vector<double>& inputs);
+    public:
+        Neuron();
+        std::vector<double> getWeights() const;
+        double getDelta() const;
+        double getOutput() const;
+        void setDelta(double error);
+        double calculateWeightedSum(const std::vector<double>& inputs);
+        double activate(const std::vector<double>& inputs);
 };
