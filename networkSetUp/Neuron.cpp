@@ -8,7 +8,13 @@
 -processing them by multiplying with weight and then adding bias to weighted sum
 */
 
-Neuron::Neuron() : delta(0.0), output(0.0) {}
+void Neuron::setOutput(double output) {
+    this->output = output;
+};
+
+Neuron::Neuron(int inputNumber) : delta(0.0), output(0.0) {
+    this->weights.resize(inputNumber);
+}
 
 std::vector<double> Neuron::getWeights() const { return this->weights; };
 double Neuron::getDelta() const { return delta; };
@@ -22,7 +28,7 @@ void Neuron::setDelta(double error) {
     delta = error * reluDerivative(output);
 }
 
-double Neuron::calculateWeightedSum(const std::vector<double>& inputs) {
+double Neuron::calculateWeightedSum(const std::vector<double>& inputs) const {
     /*Each input multipled with corresponding weight, then all products are added together and added with the bias to return total sum*/
     double sum = this->bias;
     for (int i = 0; i < inputs.size(); i++) {

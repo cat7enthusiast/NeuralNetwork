@@ -12,11 +12,11 @@ struct Neuron {
         void setOutput(double output);
 
     public:
-        Neuron();
+        Neuron(int inputNumber);
         std::vector<double> getWeights() const;
         double getDelta() const;
         double getOutput() const;
         void setDelta(double error);
-        double calculateWeightedSum(const std::vector<double>& inputs);
+        double calculateWeightedSum(const std::vector<double>& inputs) const;
         double activate(const std::vector<double>& inputs);
 };
