@@ -1,19 +1,17 @@
-#pragma once 
+#pragma once
 
-#include "Neuron.hpp"
 #include <vector>
+#include "Neuron.hpp"
+#include "NetworkLayer.hpp"
 
-using std::vector;
-
-class NetworkLayer{
+class NetworkLayer {
     private:
-        vector<Neuron> neurons;
+        std::vector<Neuron> neuronLayer;
     
     public:
-        NetworkLayer(const vector<Neuron>& newNeurons);
-
-        vector<Neuron> getNeurons();
-        vector<double> totalOutput() const;
-        vector<double> activateNeurons(const vector<double>& inputs);
-        double totalDelta(int previousLayer) const;
+        NetworkLayer(std::vector<Neuron>&& neurons);
+        const std::vector<Neuron>& getLayerNeurons() const;
+        std::vector<double> getTotalOutputs() const;
+        std::vector<double> activateNeurons(const std::vector<double>& inputs);
+        double calculateTotalDelta(int previousNeuronIndex) const;
 };
