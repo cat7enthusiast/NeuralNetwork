@@ -19,4 +19,6 @@ struct Neuron {
         void setDelta(double error);
         double calculateWeightedSum(const std::vector<double>& inputs) const;
         double activate(const std::vector<double>& inputs);
+        void updateWeights(int idx, double adjsment, bool add);
+        void updateBiases(double learnRate, double delta);
 };

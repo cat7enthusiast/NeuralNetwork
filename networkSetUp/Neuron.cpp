@@ -44,3 +44,15 @@ double Neuron::activate(const std::vector<double>& inputs) {
     setOutput(output);
     return output;
 }
+
+void Neuron::updateWeights(int idx, double adjsment, bool add) {
+    if (add) {
+        weights[idx] += adjsment;
+        return;
+    }
+    weights[idx] = adjsment;
+}
+
+void Neuron::updateBiases(double learnRate, double delta) {
+    bias += learnRate * delta;
+}
