@@ -10,8 +10,11 @@ class NetworkLayer {
     
     public:
         NetworkLayer(std::vector<Neuron>&& neurons);
-        const std::vector<Neuron>& getLayerNeurons() const;
+
+        std::vector<Neuron>& getLayerNeurons();
         std::vector<double> getTotalOutputs() const;
         std::vector<double> activateNeurons(const std::vector<double>& inputs);
         double calculateTotalDelta(int previousNeuronIndex) const;
+
+        
 };

@@ -4,7 +4,7 @@
 
 NetworkLayer::NetworkLayer(std::vector<Neuron>&& neurons) : neuronLayer(std::move(neurons)) {}
 
-const std::vector<Neuron>& NetworkLayer::getLayerNeurons() const {
+std::vector<Neuron>& NetworkLayer::getLayerNeurons() {
     return neuronLayer;
 };
 
