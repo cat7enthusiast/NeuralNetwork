@@ -1,6 +1,6 @@
 #include <cmath>
+#include <iostream>
 #include "Network.hpp"
-
 
 vector<NetworkLayer> Network::getLayers() const {
     vector<NetworkLayer> allLayers = hiddenLayers;
@@ -9,7 +9,6 @@ vector<NetworkLayer> Network::getLayers() const {
 }
 
 vector<double> Network::feedForward(vector<double>& inputs) {
-    /*this handles the feed forwarding as the outputs are updated with every input as we go*/
     for (auto& i : hiddenLayers){
         inputs = i.activateNeurons(inputs);
     }
@@ -25,8 +24,6 @@ vector<double> Network::errorCalculation(vector<double>& givenValue, vector<doub
 }
 
 void Network::backPropagate(vector<double>& inputs, vector<double>& errors){
-    /*okay cuties, so the whole delta of the output layer is just e'(x) assuming thats the error func * relu'(x) YEA I CAN CALL THESE FUNCTIONS WHAT I WANT
-    that way, when going backwards, output is ready to be used :3*/
     for (size_t i = 0; i < outputLayer.getLayerNeurons().size(); i++){
         outputLayer.getLayerNeurons()[i].setDelta(errors[i]);
     }
@@ -42,7 +39,6 @@ void Network::backPropagate(vector<double>& inputs, vector<double>& errors){
         }
     }
     updateAllWeights(inputs);
-    
 }
 
 void Network::updateAllWeights(vector<double>& inputs){
@@ -59,16 +55,11 @@ void Network::updateAllWeights(vector<double>& inputs){
     }
 }
 
-void Network::updateSingleWeights(vector<double>& previousOutputs, Neuron neuron){
-    /*
-    ∂Error/∂weight
-    delta: how much the error changes with respect to neuron's output
-    input: how much neuron's output changes with respect to specific weight
-    */
+void Network::updateSingleWeights(vector<double>& previousOutputs, Neuron& neuron){
     for (size_t i = 0; i < previousOutputs.size(); i++){
         neuron.updateWeights(i, (rate * neuron.getDelta() * previousOutputs[i]), true);
-        neuron.updateBiases(this->rate, neuron.getDelta());
     }
+    neuron.updateBiases(this->rate, neuron.getDelta());  // Moved outside loop
 }
 
 double Network::meanSquaredError(vector<double>& prediction, vector<double>& expected){
@@ -80,21 +71,26 @@ double Network::meanSquaredError(vector<double>& prediction, vector<double>& exp
 }
 
 void Network::trainModel(int epochNumber, int outputNumber, vector<vector<double>>& trainingSet, vector<double>& trainingOutput){
-    for (int i = 0; i < epochNumber; i++){
+    for (int epoch = 0; epoch < epochNumber; epoch++){
         double sumError = 0.0;
-        vector<double> expectedValues;
+        
         for (size_t j = 0; j < trainingSet.size(); j++){
-            for (int k = 0; k < outputNumber; k++){
-                expectedValues.push_back(0.0);
-            }
-            expectedValues[trainingOutput[j]] = 1.0;
+            vector<double> expectedValues(outputNumber, 0.0);
+            expectedValues[static_cast<int>(trainingOutput[j])] = 1.0;
+            
             vector<double> prediction = feedForward(trainingSet[j]);
             vector<double> error = errorCalculation(prediction, expectedValues);
             backPropagate(trainingSet[j], error);
-            sumError += meanSquaredError(prediction, trainingOutput);
+            
+            sumError += meanSquaredError(prediction, expectedValues);
+        }
+        
+        if (epoch % 100 == 0) {
+            std::cout << "Epoch " << epoch << ", Avg Error: " << sumError / trainingSet.size() << std::endl;
         }
     }
 }
+
 int Network::predictInfo(vector<double>& inputs) {
     vector<double> allOutputs = feedForward(inputs);
     return std::max_element(allOutputs.begin(), allOutputs.end()) - allOutputs.begin();
