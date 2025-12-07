@@ -22,5 +22,5 @@ class Network{
         void updateSingleWeights(vector<double>& previousOutputs, Neuron neuron);
         double meanSquaredError(vector<double>& prediction, vector<double>& expected);
         void trainModel(int epochNumber, int outputNumber, vector<vector<double>>& trainingSet, vector<double>& trainingOutput);
-        int predictInfo(vector<double>& inputs) const;
+        int predictInfo(vector<double>& inputs);
 };

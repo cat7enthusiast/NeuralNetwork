@@ -27,17 +27,17 @@ vector<double> Network::errorCalculation(vector<double>& givenValue, vector<doub
 void Network::backPropagate(vector<double>& inputs, vector<double>& errors){
     /*okay cuties, so the whole delta of the output layer is just e'(x) assuming thats the error func * relu'(x) YEA I CAN CALL THESE FUNCTIONS WHAT I WANT
     that way, when going backwards, output is ready to be used :3*/
-    for (size_t i = 0; i < outputLayer.getNeurons().size(); i++){
-        outputLayer.getNeurons()[i].setDelta(errors[i]);
+    for (size_t i = 0; i < outputLayer.getLayerNeurons().size(); i++){
+        outputLayer.getLayerNeurons()[i].setDelta(errors[i]);
     }
 
     for (int layerIndex = hiddenLayers.size() - 1; layerIndex >= 0; --layerIndex){
         NetworkLayer& layer = hiddenLayers[layerIndex];
         NetworkLayer& nextLayer = (layerIndex == hiddenLayers.size() - 1) ? outputLayer : hiddenLayers[layerIndex + 1];
 
-        for (size_t i = 0; i < layer.getNeurons().size(); ++i){
-            Neuron& neuron = layer.getNeurons()[i];
-            double nextError = nextLayer.totalDelta(i);
+        for (size_t i = 0; i < layer.getLayerNeurons().size(); ++i){
+            Neuron& neuron = layer.getLayerNeurons()[i];
+            double nextError = nextLayer.calculateTotalDelta(i);
             neuron.setDelta(nextError);
         }
     }
@@ -48,13 +48,14 @@ void Network::backPropagate(vector<double>& inputs, vector<double>& errors){
 void Network::updateAllWeights(vector<double>& inputs){
     for (size_t layerIndex = 0; layerIndex < hiddenLayers.size(); layerIndex++){
         NetworkLayer& layer = hiddenLayers[layerIndex];
-        vector<double> previousOutputs = (layerIndex == 0) ? inputs : hiddenLayers[layerIndex - 1].totalOutput();
-        for(Neuron& i : layer.getNeurons()){
+        vector<double> previousOutputs = (layerIndex == 0) ? inputs : hiddenLayers[layerIndex - 1].getTotalOutputs();
+        for(Neuron& i : layer.getLayerNeurons()){
             updateSingleWeights(previousOutputs, i);
         }
     }
-    for (size_t i = 0; i < outputLayer.getNeurons().size(); i++){
-        updateSingleWeights(hiddenLayers.back().totalOutput(), outputLayer.getNeurons()[i]);
+    vector<double> lastHiddenOutput = hiddenLayers.back().getTotalOutputs();
+    for (size_t i = 0; i < outputLayer.getLayerNeurons().size(); i++){
+        updateSingleWeights(lastHiddenOutput, outputLayer.getLayerNeurons()[i]);
     }
 }
 
@@ -65,7 +66,7 @@ void Network::updateSingleWeights(vector<double>& previousOutputs, Neuron neuron
     input: how much neuron's output changes with respect to specific weight
     */
     for (size_t i = 0; i < previousOutputs.size(); i++){
-        neuron.UpdateWeights(i, (rate * neuron.getDelta() * previousOutputs[i]), true);
+        neuron.updateWeights(i, (rate * neuron.getDelta() * previousOutputs[i]), true);
         neuron.updateBiases(this->rate, neuron.getDelta());
     }
 }
@@ -94,7 +95,7 @@ void Network::trainModel(int epochNumber, int outputNumber, vector<vector<double
         }
     }
 }
-int Network::predictInfo(vector<double>& inputs) const {
+int Network::predictInfo(vector<double>& inputs) {
     vector<double> allOutputs = feedForward(inputs);
     return std::max_element(allOutputs.begin(), allOutputs.end()) - allOutputs.begin();
 }
